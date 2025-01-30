@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left Start"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left to Coral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "To Left Side Reef 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left Side Coral Station 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "To Left Side Reef 3"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
