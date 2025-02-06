@@ -8,13 +8,13 @@ import static edu.wpi.first.units.Units.Inches;
 public class constants {
     
     public static class CANConfig {
-        public static final int ELEVATOR_FRONT = 0;
-        public static final int ELEVATOR_BACK = 1;
+        public static final int ELEVATOR_FRONT = 30;
+        public static final int ELEVATOR_BACK = 31;
         public static final int ALGAE_PIVOT = 1;
-        public static final int PIVOT = 2;
+        public static final int CORAL_PIVOT = 2;
         public static final int ALGAE_INTAKE = 3;
-        public static final int CORAL_LEFT = 4;
-        public static final int CORAL_RIGHT = 5;
+        public static final int CORAL_INTAKE = 4;
+
       }
 
       public static class SystemConfig {
@@ -33,5 +33,14 @@ public class constants {
     public static final Distance PROCCESSOR_APRILTAG_HEIGHT = Distance.ofBaseUnits(45.875, Inches);
     public static final Distance CORAL_APRILTAG_HEIGHT = Distance.ofBaseUnits(53.25, Inches);
   }
+      public static class ArmConstants  {
+
+        public static final double kUpperLimit = 1;
+        public static final double kLowerLimit = 0.5;
+                public static final double kTolearance = 0.01;
+        public static final double kManualSpeed = 0.3;
+
+      }
+
 
     }
