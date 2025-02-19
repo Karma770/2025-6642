@@ -35,8 +35,8 @@ public class constants {
   }
       public static class ArmConstants  {
 
-        public static final double kUpperLimit = 1;
-        public static final double kLowerLimit = 0.5;
+        public static final double kUpperLimit = 10000;
+        public static final double kLowerLimit = -10000;
                 public static final double kTolearance = 0.01;
         public static final double kManualSpeed = 0.3;
 

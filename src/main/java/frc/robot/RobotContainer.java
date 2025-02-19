@@ -48,6 +48,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController gamepad = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -92,7 +93,11 @@ public class RobotContainer {
         joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-        joystick.x().onTrue(new RunArmClosedLoop(m_Elevator , 1));
+        gamepad.b().onTrue(new RunArmClosedLoop(m_Elevator , .25));
+        gamepad.y().onTrue(new RunArmClosedLoop(m_Elevator , 1));    
+        gamepad.a().onTrue(new RunArmClosedLoop(m_Elevator , 2));      
+        gamepad.x().onTrue(new RunArmClosedLoop(m_Elevator , 3));     
+        
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 

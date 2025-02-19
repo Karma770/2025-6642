@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.AlternateEncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -11,7 +12,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 
-
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.*;
 
@@ -30,7 +31,7 @@ public class Elevator extends SubsystemBase{
 
     public final SparkMax LeftMotor;
     public final SparkMax RightMotor;
-    private final AbsoluteEncoder encoder;
+    private final RelativeEncoder encoder;
     private final SparkClosedLoopController armPID;
 
 
@@ -47,24 +48,18 @@ Leftconfig.encoder
     .velocityConversionFactor(1000);
 Leftconfig.closedLoop
     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-    .pid(1.0, 0.0, 0.0);
+    .pid(6.0, 0.0, 0.7);
 
             SparkMaxConfig Rightconfig = new SparkMaxConfig();
 Rightconfig
-    .inverted(true)
     .idleMode(IdleMode.kBrake)
     .follow(LeftMotor, true);
-Rightconfig.encoder
-    .positionConversionFactor(1000)
-    .velocityConversionFactor(1000);
-Rightconfig.closedLoop
-    .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-    .pid(1.0, 0.0, 0.0);
+
     
 LeftMotor.configure(Leftconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        encoder = LeftMotor.getAbsoluteEncoder();
+        encoder = LeftMotor.getEncoder();
         armPID = LeftMotor.getClosedLoopController();
 
 
@@ -74,11 +69,11 @@ RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kP
 
     public void runOpenLoop(double supplier) {
         if(getPos() >= ArmConstants.kUpperLimit) {
-            LeftMotor.set(0);
+            LeftMotor.set(-1);
             System.out.println("¡TOO HIGH! ¡UPPER LIMIT!");
         }
         else if(getPos() <= ArmConstants.kLowerLimit) {
-            LeftMotor.set(0);
+            LeftMotor.set(1);
             System.out.println("¡TOO LOW! ¡LOWER LIMIT!");
         }
         else {
@@ -107,12 +102,12 @@ RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kP
         System.out.println(setpoint);
         //these are included safety measures. not necessary, but useful
         if(getPos() >= ArmConstants.kUpperLimit) {
-            LeftMotor.set(0);
+            LeftMotor.set(-1);
             System.out.println("¡TOO HIGH! ¡UPPER LIMIT!");
             System.out.println(getPos());
         }
         else if(getPos() <= ArmConstants.kLowerLimit) {
-            LeftMotor.set(0);;
+            LeftMotor.set(1);;
             System.out.println("¡TOO LOW! ¡LOWER LIMIT!");
             System.out.println(getPos());
         }
