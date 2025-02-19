@@ -44,14 +44,16 @@ public class Elevator extends SubsystemBase{
 Leftconfig
     .idleMode(IdleMode.kBrake);
 Leftconfig.encoder
-    .positionConversionFactor(1000)
-    .velocityConversionFactor(1000);
+    .positionConversionFactor(1)
+    .velocityConversionFactor(1);
 Leftconfig.closedLoop
     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-    .pid(6.0, 0.0, 0.7);
+    .p(1.0)
+    .d(.5);
 
             SparkMaxConfig Rightconfig = new SparkMaxConfig();
 Rightconfig
+    .inverted(true )
     .idleMode(IdleMode.kBrake)
     .follow(LeftMotor, true);
 
@@ -69,11 +71,11 @@ RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kP
 
     public void runOpenLoop(double supplier) {
         if(getPos() >= ArmConstants.kUpperLimit) {
-            LeftMotor.set(-1);
+            LeftMotor.set(0);
             System.out.println("¡TOO HIGH! ¡UPPER LIMIT!");
         }
         else if(getPos() <= ArmConstants.kLowerLimit) {
-            LeftMotor.set(1);
+            LeftMotor.set(0);
             System.out.println("¡TOO LOW! ¡LOWER LIMIT!");
         }
         else {
@@ -107,7 +109,7 @@ RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kP
             System.out.println(getPos());
         }
         else if(getPos() <= ArmConstants.kLowerLimit) {
-            LeftMotor.set(1);;
+            LeftMotor.set(1);
             System.out.println("¡TOO LOW! ¡LOWER LIMIT!");
             System.out.println(getPos());
         }

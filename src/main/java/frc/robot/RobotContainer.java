@@ -21,11 +21,13 @@ import frc.robot.constants.ArmConstants;
 import frc.robot.constants.CANConfig;
 import frc.robot.commands.Arm.RunArmClosedLoop;
 import frc.robot.commands.Arm.RunArmOpenLoop;
-//import frc.robot.commands.AlignCommand;
+import frc.robot.commands.limelight.LimelightLateralAlignCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.VisionSubsystem;
+//import frc.robot.subsystems.VisionSubsystem;
+
+
 
 
 
@@ -34,7 +36,7 @@ public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-    private final VisionSubsystem m_Vision = new VisionSubsystem();
+
     private final Elevator m_Elevator = new Elevator( CANConfig.ELEVATOR_FRONT, CANConfig.ELEVATOR_BACK);
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -93,10 +95,11 @@ public class RobotContainer {
         joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-        gamepad.b().onTrue(new RunArmClosedLoop(m_Elevator , .25));
-        gamepad.y().onTrue(new RunArmClosedLoop(m_Elevator , 1));    
-        gamepad.a().onTrue(new RunArmClosedLoop(m_Elevator , 2));      
-        gamepad.x().onTrue(new RunArmClosedLoop(m_Elevator , 3));     
+        joystick.x().onTrue(new LimelightLateralAlignCommand(drivetrain, 6.0));
+        gamepad.b().onTrue(new RunArmClosedLoop(m_Elevator , 5));
+        gamepad.y().onTrue(new RunArmClosedLoop(m_Elevator , 10));    
+        gamepad.a().onTrue(new RunArmClosedLoop(m_Elevator , 20));      
+        gamepad.x().onTrue(new RunArmClosedLoop(m_Elevator , 30));     
         
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
