@@ -2,13 +2,12 @@ package frc.robot.commands.limelight;
 
 
 import edu.wpi.first.math.controller.PIDController; 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;  
 import frc.robot.LimelightHelpers; 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
-public class LimelightLateralAlignCommand extends Command{ 
+public class LimelightLateralAlignCommandY extends Command{ 
     
     
 private final CommandSwerveDrivetrain drivetrain;
@@ -29,7 +28,7 @@ private final double conversionFactor = 1.0; // inches per degree
 // If you want it to be 6 inches to one side, set desiredOffset = 6 (or -6 for the opposite side).
 private final double desiredOffsetInches;
 
-public LimelightLateralAlignCommand(CommandSwerveDrivetrain drivetrain, double desiredOffsetInches) {
+public LimelightLateralAlignCommandY(CommandSwerveDrivetrain drivetrain, double desiredOffsetInches) {
     this.drivetrain = drivetrain;
     this.desiredOffsetInches = desiredOffsetInches;
     addRequirements(drivetrain);
@@ -51,11 +50,9 @@ public void execute() {
     // For example, if you want the robot centered (0 inches), the error is currentLateralOffset - 0.
     // If you want a 6-inch offset, the error is currentLateralOffset - 6.
     double error = currentLateralOffset - desiredOffsetInches;
+    
 
-
-    SmartDashboard.putNumber("error",error);
-
-
+    
     // Get the lateral adjustment command from the PID controller.
     double lateralSpeedCommand = pidController.calculate(error);
     
