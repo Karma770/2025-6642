@@ -21,7 +21,8 @@ import frc.robot.constants.ArmConstants;
 import frc.robot.constants.CANConfig;
 import frc.robot.commands.Arm.RunArmClosedLoop;
 import frc.robot.commands.Arm.RunArmOpenLoop;
-import frc.robot.commands.limelight.LimelightLateralAlignCommand;
+import frc.robot.commands.limelight.LimelightLateralAlignCommandY;
+import frc.robot.commands.limelight.LimelightLateralAlignCommandX;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
@@ -95,7 +96,7 @@ public class RobotContainer {
         joystick.back().and(joystick.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-        joystick.x().whileTrue(new LimelightLateralAlignCommand(drivetrain, 12.0));
+        joystick.x().whileTrue(new LimelightLateralAlignCommandX(drivetrain, 12.0));
         gamepad.b().onTrue(new RunArmClosedLoop(m_Elevator , 5));
         gamepad.y().onTrue(new RunArmClosedLoop(m_Elevator , 10));    
         gamepad.a().onTrue(new RunArmClosedLoop(m_Elevator , 20));      
