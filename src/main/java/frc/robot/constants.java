@@ -10,10 +10,17 @@ public class constants {
     public static class CANConfig {
         public static final int ELEVATOR_FRONT = 30;
         public static final int ELEVATOR_BACK = 31;
-        public static final int ALGAE_PIVOT = 1;
-        public static final int CORAL_PIVOT = 2;
-        public static final int ALGAE_INTAKE = 3;
-        public static final int CORAL_INTAKE = 4;
+        public static final int ALGAE_PIVOT = 40;
+        public static final int ALGAE_INTAKE_LEFT = 41;
+
+        public static final int CORAL_PIVOT_LEFT = 20;
+        public static final int CORAL_PIVOT_RIGHT = 21;
+        public static final int CORAL_RUN_LEFT = 22;
+        public static final int CORAL_RUN_RIGHT = 23;
+
+
+        public static final int ALGAE_INTAKE_RIGHT = 42;
+
 
       }
 
@@ -37,8 +44,14 @@ public class constants {
 
         public static final double kUpperLimit = 300;
         public static final double kLowerLimit = -30;
-                public static final double kTolearance = 0.1;
+        public static final double kTolearance = 0.1;
         public static final double kManualSpeed = 0.3;
+        public static final double L1pos = 20;
+        public static final double L2pos = 30;
+        public static final double L3pos = 40;
+        public static final double L4pos = 40;
+        public static final double Lstowpos = 40;
+
 
       }
 

@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "L1"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Middle Start To Coral Station"

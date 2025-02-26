@@ -37,8 +37,8 @@ public class IntakePivot extends SubsystemBase{
 
     public IntakePivot (int elevatorFront, int elevatorBack) {
 
-        LeftMotor = new SparkMax(CANConfig.ELEVATOR_BACK, MotorType.kBrushless);
-        RightMotor = new SparkMax(CANConfig.ELEVATOR_FRONT, MotorType.kBrushless);
+        LeftMotor = new SparkMax(CANConfig.CORAL_PIVOT_LEFT, MotorType.kBrushless);
+        RightMotor = new SparkMax(CANConfig.CORAL_PIVOT_RIGHT, MotorType.kBrushless);
         encoder = LeftMotor.getAbsoluteEncoder();
         armPID = LeftMotor.getClosedLoopController();
 

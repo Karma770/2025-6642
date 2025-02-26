@@ -10,11 +10,14 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.constants.ArmConstants;
@@ -58,9 +61,46 @@ public class RobotContainer {
     /* Path follower */
     private final SendableChooser<Command> autoChooser;
 
+    
+
+
+    SequentialCommandGroup L1= new SequentialCommandGroup(
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L1pos).withTimeout(0.6)
+      );
+    SequentialCommandGroup L2= new SequentialCommandGroup(
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L2pos).withTimeout(0.6)
+      );
+    SequentialCommandGroup L3= new SequentialCommandGroup(
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L3pos).withTimeout(0.6)
+      );
+    SequentialCommandGroup L4= new SequentialCommandGroup(
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L4pos).withTimeout(0.6)
+      );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public RobotContainer() {
         autoChooser = AutoBuilder.buildAutoChooser("Tests");
         SmartDashboard.putData("Auto Mode", autoChooser);
+        NamedCommands.registerCommand("L1", L1);
+        NamedCommands.registerCommand("L2", L2);
+        NamedCommands.registerCommand("L3", L3);
+        NamedCommands.registerCommand("L4", L4);
 
         configureBindings();
     }
