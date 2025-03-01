@@ -11,7 +11,6 @@ public class LimelightLateralAlignCommandY extends Command {
     private final CommandSwerveDrivetrain drivetrain;
     private final PIDController pidController = new PIDController(.05, 0.0, .01);
     private final String limelightName = "limelight";
-    private final double conversionFactor = 1.0; // inches per degree
     private final double desiredOffsetInches;
 
     private double previousDistance = 36.0; // ✅ ADDED for smoothing distance updates

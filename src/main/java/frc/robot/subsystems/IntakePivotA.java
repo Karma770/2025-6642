@@ -3,16 +3,14 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
-
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
-
-import com.revrobotics.RelativeEncoder;
-
 
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,47 +23,44 @@ import frc.robot.constants.*;
 
 
 
-public class Elevator extends SubsystemBase{
+public class IntakePivotA extends SubsystemBase{
 
     /*We need methods to run the arm to postions using a rev throughbore encoder in absolute mode.
      * It is needed to read arm position and to move the arm.
      */
 
     public final SparkMax LeftMotor;
-    public final SparkMax RightMotor;
-    private final RelativeEncoder encoder;
+    private final AbsoluteEncoder encoder;
     private final SparkClosedLoopController armPID;
 
 
-    public Elevator (int elevatorFront, int elevatorBack) {
+    public IntakePivotA (int elevatorFront) {
 
-        LeftMotor = new SparkMax(CANConfig.ELEVATOR_BACK, MotorType.kBrushless);
-        RightMotor = new SparkMax(CANConfig.ELEVATOR_FRONT, MotorType.kBrushless);
+        LeftMotor = new SparkMax(CANConfig.CORAL_PIVOT_LEFT, MotorType.kBrushless);
+        encoder = LeftMotor.getAbsoluteEncoder();
+        armPID = LeftMotor.getClosedLoopController();
+
 
         SparkMaxConfig Leftconfig = new SparkMaxConfig();
 Leftconfig
+    .inverted(false)
+    .smartCurrentLimit(40)
     .idleMode(IdleMode.kBrake);
-Leftconfig.encoder
-    .positionConversionFactor(1)
-    .velocityConversionFactor(1);
+Leftconfig.absoluteEncoder
+    .positionConversionFactor(5)
+    .velocityConversionFactor(.5);
 Leftconfig.closedLoop
-    .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-    .p(6.0)
-    .i(0.0)
-    .d(0.75);
+    .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+    .p(6)
+    .d(1);
 
             SparkMaxConfig Rightconfig = new SparkMaxConfig();
 Rightconfig
-    .inverted(false )
     .idleMode(IdleMode.kBrake)
     .follow(LeftMotor, true);
 
     
 LeftMotor.configure(Leftconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        encoder = LeftMotor.getEncoder();
-        armPID = LeftMotor.getClosedLoopController();
 
 
 
@@ -90,7 +85,7 @@ RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kP
     public void hold() {
         //armPID.setReference(encoder.getPosition(), ControlType.kPosition);
          if(getPos() < ArmConstants.kUpperLimit) {
-        LeftMotor.set(0.);
+        LeftMotor.set(0.03);
          }
     }
     public void stopArm(double speed){
@@ -104,29 +99,23 @@ RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kP
         System.out.println("Arm Current Position");
         System.out.println(getPos());
         System.out.println(setpoint);
-
-
-        System.out.println("Arm Current Spd");
-        System.out.println();
-
-
         //these are included safety measures. not necessary, but useful
         if(getPos() >= ArmConstants.kUpperLimit) {
-            LeftMotor.set(-2);
+            LeftMotor.set(0);
             System.out.println("¡TOO HIGH! ¡UPPER LIMIT!");
             System.out.println(getPos());
         }
         else if(getPos() <= ArmConstants.kLowerLimit) {
-            LeftMotor.set(2);
+            LeftMotor.set(0);;
             System.out.println("¡TOO LOW! ¡LOWER LIMIT!");
             System.out.println(getPos());
         }
         else{
-
             armPID.setReference(setpoint, ControlType.kPosition);
-            
-
         }
+
+
+        
     }
 
     public double getPos() {

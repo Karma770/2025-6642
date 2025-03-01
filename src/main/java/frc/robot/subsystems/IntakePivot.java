@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.EncoderConfig;
+
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -12,7 +12,7 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 
-import edu.wpi.first.wpilibj.Encoder;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.*;
 
@@ -30,15 +30,13 @@ public class IntakePivot extends SubsystemBase{
      */
 
     public final SparkMax LeftMotor;
-    public final SparkMax RightMotor;
     private final AbsoluteEncoder encoder;
     private final SparkClosedLoopController armPID;
 
 
-    public IntakePivot (int elevatorFront, int elevatorBack) {
+    public IntakePivot (int elevatorFront) {
 
         LeftMotor = new SparkMax(CANConfig.CORAL_PIVOT_LEFT, MotorType.kBrushless);
-        RightMotor = new SparkMax(CANConfig.CORAL_PIVOT_RIGHT, MotorType.kBrushless);
         encoder = LeftMotor.getAbsoluteEncoder();
         armPID = LeftMotor.getClosedLoopController();
 
@@ -63,7 +61,6 @@ Rightconfig
 
     
 LeftMotor.configure(Leftconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
 
 
@@ -89,7 +86,6 @@ RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kP
         //armPID.setReference(encoder.getPosition(), ControlType.kPosition);
          if(getPos() < ArmConstants.kUpperLimit) {
         LeftMotor.set(0.03);
-        RightMotor.set(0.03);
          }
     }
     public void stopArm(double speed){
