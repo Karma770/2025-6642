@@ -6,18 +6,18 @@ package frc.robot.commands.IntakeA;
 
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.intakeA;
+import frc.robot.subsystems.IntakePivotA;
 
 
 
 public class RunIntakeOpenLoop extends Command {
 
-  private intakeA intake;
-  private double speed;
+  private IntakePivotA intake;
+  private double pos;
   /** Creates a new RunIntakeOpenLoop. */
-  public RunIntakeOpenLoop(intakeA in, double input) {
+  public RunIntakeOpenLoop(IntakePivotA in, double input) {
     intake = in;
-    speed = input;
+    pos = input;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(in);
   }
@@ -29,7 +29,7 @@ public class RunIntakeOpenLoop extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.runOpenLoop(speed);
+    intake.runToPosition(pos);
   }
 
   // Called once the command ends or is interrupted.

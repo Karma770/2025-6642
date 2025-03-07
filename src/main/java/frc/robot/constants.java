@@ -13,8 +13,7 @@ public class constants {
         public static final int ALGAE_PIVOT = 40;
         public static final int ALGAE_INTAKE_LEFT = 41;
 
-        public static final int CORAL_PIVOT_LEFT = 20;
-        public static final int CORAL_PIVOT_RIGHT = 21;
+        public static final int CORAL_PIVOT_LEFT = 21;
         public static final int CORAL_RUN_LEFT = 22;
         public static final int CORAL_RUN_RIGHT = 23;
 
@@ -28,7 +27,7 @@ public class constants {
         public static final double ELEVATOR_SPEED = .5;
         public static final double PIVOT_SPEED = 0.5;
         public static final double ALGAE_INTAKE_SPEED = 0.5;
-        public static final double CORAL_INTAKE_SPEED = 0.5;
+        public static final double CORAL_INTAKE_SPEED = 0.15;
       }
 
         public static class VisionConstants {
@@ -43,14 +42,20 @@ public class constants {
       public static class ArmConstants  {
 
         public static final double kUpperLimit = 30000;
-        public static final double kLowerLimit = -30;
+        public static final double kLowerLimit = 0;
         public static final double kTolearance = 5;
         public static final double kManualSpeed = 0.3;
-        public static final double L1pos = 100;
-        public static final double L2pos = 300;
-        public static final double L3pos = 400;
-        public static final double L4pos = 400;
+        public static final double L1pos = 30;
+        public static final double L2pos = 40;
+        public static final double L3pos = 50;
+        public static final double L4pos = 100;
         public static final double Lstowpos = 40;
+        public static final double CPivotStow = .15;
+        public static final double CPivotScore = .4;
+        public static final double CPivotGrab = .6;
+        public static final double APivotGrab = .20;
+        public static final double APivotStow = .43;
+
 
 
       }

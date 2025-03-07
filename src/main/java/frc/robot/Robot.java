@@ -11,18 +11,25 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.Intake.RunIntakeOpenLoopB;
+import frc.robot.constants.ArmConstants;
+import frc.robot.subsystems.IntakePivot;
+import frc.robot.subsystems.IntakePivotA;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private Command m_roboOn;
 
   private final RobotContainer m_robotContainer;
 
   private final boolean kUseLimelight = false;
-
+  //private final IntakePivot m_IntakePivot;
+  //private final IntakePivotA m_IntakePivotA;
   public Robot() {
     m_robotContainer = new RobotContainer();
+
   }
 
   @Override
@@ -50,11 +57,22 @@ public class Robot extends TimedRobot {
     }
   }
 
-  @Override
-  public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledInit() {
+
+}
+
+
+
+
+  
+
+  @Override
+  public void disabledPeriodic() {
+
+
+  }
 
   @Override
   public void disabledExit() {}
@@ -79,7 +97,6 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-    CameraServer.startAutomaticCapture("USB CAM", 0); // id
 
 
   }

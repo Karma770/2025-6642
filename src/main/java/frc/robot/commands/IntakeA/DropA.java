@@ -14,15 +14,15 @@ import frc.robot.constants.*;
 //import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.intakeA;
 
-public class IntakeNoteAutomatic extends Command {
+public class DropA extends Command {
   //private final BlinkinSubsystem m_blink = new BlinkinSubsystem(0);
 //private final Blinkin m_blink = new Blinkin(0);
   private intakeA intake;
   private boolean end;
-  private double speed;
+
 
   /** Creates a new IntakeNoteAutomatic. */
-  public IntakeNoteAutomatic(intakeA in, double speed) {
+  public DropA(intakeA in) {
     intake = in;
     
     end = false;
@@ -38,15 +38,14 @@ public class IntakeNoteAutomatic extends Command {
   @Override
   public void initialize() {
 
-        intake.autoIntake();
+    intake.Drop();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
   
-
-
+  
 
     }
   
@@ -55,12 +54,11 @@ public class IntakeNoteAutomatic extends Command {
   @Override
   public void end(boolean interrupted) {
 
-
   }
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-      return true;
+      return false; 
  
     
      

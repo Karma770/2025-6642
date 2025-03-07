@@ -82,7 +82,7 @@ public class intake extends SubsystemBase{
 
     public void autoIntake() {
         if(!isCoral()){
-            intakePID.setReference(20, ControlType.kVelocity);
+            intakePID.setReference(0.05, ControlType.kVelocity);
         }
         else {
             hold(encoder.getPosition());
@@ -90,7 +90,8 @@ public class intake extends SubsystemBase{
     }
 
     public boolean isCoral() {
-        return optic.get();
+        return false;
+       // return optic.get();
     }
 
     public double getPosition() {

@@ -34,9 +34,9 @@ public class IntakePivotA extends SubsystemBase{
     private final SparkClosedLoopController armPID;
 
 
-    public IntakePivotA (int elevatorFront) {
+    public IntakePivotA () {
 
-        LeftMotor = new SparkMax(CANConfig.CORAL_PIVOT_LEFT, MotorType.kBrushless);
+        LeftMotor = new SparkMax(CANConfig.ALGAE_PIVOT, MotorType.kBrushless);
         encoder = LeftMotor.getAbsoluteEncoder();
         armPID = LeftMotor.getClosedLoopController();
 
@@ -47,12 +47,12 @@ Leftconfig
     .smartCurrentLimit(40)
     .idleMode(IdleMode.kBrake);
 Leftconfig.absoluteEncoder
-    .positionConversionFactor(5)
-    .velocityConversionFactor(.5);
+    .positionConversionFactor(1)
+    .velocityConversionFactor(1);
 Leftconfig.closedLoop
     .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-    .p(6)
-    .d(1);
+    .p(1.25)
+    .d(0);
 
             SparkMaxConfig Rightconfig = new SparkMaxConfig();
 Rightconfig
@@ -68,11 +68,11 @@ LeftMotor.configure(Leftconfig, ResetMode.kResetSafeParameters, PersistMode.kPer
     }
 
     public void runOpenLoop(double supplier) {
-        if(getPos() >= ArmConstants.kUpperLimit) {
+        if(getPos() >= 1) {
             LeftMotor.set(0);
             System.out.println("¡TOO HIGH! ¡UPPER LIMIT!");
         }
-        else if(getPos() <= ArmConstants.kLowerLimit) {
+        else if(getPos() <= 0) {
             LeftMotor.set(0);
             System.out.println("¡TOO LOW! ¡LOWER LIMIT!");
         }
@@ -99,20 +99,9 @@ LeftMotor.configure(Leftconfig, ResetMode.kResetSafeParameters, PersistMode.kPer
         System.out.println("Arm Current Position");
         System.out.println(getPos());
         System.out.println(setpoint);
-        //these are included safety measures. not necessary, but useful
-        if(getPos() >= ArmConstants.kUpperLimit) {
-            LeftMotor.set(0);
-            System.out.println("¡TOO HIGH! ¡UPPER LIMIT!");
-            System.out.println(getPos());
-        }
-        else if(getPos() <= ArmConstants.kLowerLimit) {
-            LeftMotor.set(0);;
-            System.out.println("¡TOO LOW! ¡LOWER LIMIT!");
-            System.out.println(getPos());
-        }
-        else{
+   
             armPID.setReference(setpoint, ControlType.kPosition);
-        }
+        
 
 
         

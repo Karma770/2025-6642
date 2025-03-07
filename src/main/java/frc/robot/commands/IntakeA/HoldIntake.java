@@ -20,7 +20,6 @@ public class HoldIntake extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    setpoint = intake.getPosition();
   }
 
   // Called every time the scheduler runs while the command is scheduled.

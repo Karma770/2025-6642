@@ -14,7 +14,12 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 
 import com.revrobotics.RelativeEncoder;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.*;
 
@@ -36,6 +41,12 @@ public class Elevator extends SubsystemBase{
     private final RelativeEncoder encoder;
     private final SparkClosedLoopController armPID;
 
+    private final ShuffleboardTab tab = Shuffleboard.getTab("Elevator");
+    private final GenericEntry currentEntry = tab.add("position", 0)
+                                                .withWidget(BuiltInWidgets.kGraph)
+                                                .getEntry();
+
+
 
     public Elevator (int elevatorFront, int elevatorBack) {
 
@@ -44,14 +55,15 @@ public class Elevator extends SubsystemBase{
 
         SparkMaxConfig Leftconfig = new SparkMaxConfig();
 Leftconfig
+    .inverted(true)
     .idleMode(IdleMode.kBrake);
 Leftconfig.encoder
     .positionConversionFactor(1)
     .velocityConversionFactor(1);
 Leftconfig.closedLoop
     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-    .p(1.0)
-    .d(.5);
+    .p(.50)
+    .d(.75);
 
             SparkMaxConfig Rightconfig = new SparkMaxConfig();
 Rightconfig
@@ -89,8 +101,7 @@ RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kP
     public void hold() {
         //armPID.setReference(encoder.getPosition(), ControlType.kPosition);
          if(getPos() < ArmConstants.kUpperLimit) {
-        LeftMotor.set(0.03);
-        RightMotor.set(0.03);
+        LeftMotor.set(0.0);
          }
     }
     public void stopArm(double speed){
@@ -124,6 +135,14 @@ RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kP
 
     public double getPos() {
         return encoder.getPosition();
+    }
+
+ public void periodic() {
+        // Update SmartDashboard every cycle with the current
+        double current = getPos();
+        SmartDashboard.putNumber("Position", current);
+        currentEntry.setDouble(current);
+
     }
     
 }

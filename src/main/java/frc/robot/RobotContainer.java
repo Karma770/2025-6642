@@ -23,14 +23,22 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.constants.ArmConstants;
 import frc.robot.constants.CANConfig;
 import frc.robot.commands.Arm.RunArmClosedLoop;
-import frc.robot.commands.Arm.RunArmOpenLoop;
-import frc.robot.commands.IntakeA.Feed;
+import frc.robot.commands.Intake.IntakeSUCK;
+import frc.robot.commands.Intake.Intakespit;
+import frc.robot.commands.Intake.RunIntakeOpenLoopCoral;
+import frc.robot.commands.Intake.IntakeSUCK;
+import frc.robot.commands.IntakeA.DropA;
 import frc.robot.commands.IntakeA.IntakeNoteAutomatic;
+import frc.robot.commands.IntakeA.RunIntakeOpenLoop;
+import frc.robot.commands.IntakeA.StopA;
 import frc.robot.commands.limelight.LimelightLateralAlignCommandY;
 import frc.robot.commands.limelight.LimelightLateralAlignCommandX;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.IntakePivot;
+import frc.robot.subsystems.IntakePivotA;
+import frc.robot.subsystems.intake;
 //import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.subsystems.intakeA;
 
@@ -46,6 +54,9 @@ public class RobotContainer {
 
     private final Elevator m_Elevator = new Elevator( CANConfig.ELEVATOR_FRONT, CANConfig.ELEVATOR_BACK);
     private final intakeA m_intakeA = new intakeA();
+    private final IntakePivotA m_IntakePivotA = new IntakePivotA();
+    final IntakePivot m_IntakePivot = new IntakePivot();
+    private final intake m_intake = new intake(0);
 
 
 
@@ -77,22 +88,50 @@ public class RobotContainer {
 
 
     SequentialCommandGroup L1= new SequentialCommandGroup(
-        new RunArmClosedLoop(m_Elevator, ArmConstants.L1pos).withTimeout(0.6)
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L1pos),
+        new RunIntakeOpenLoopCoral(m_IntakePivot, ArmConstants.CPivotScore),
+        new Intakespit(m_intake).withTimeout(.5),
+        new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotScore),
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L1pos)
       );
     SequentialCommandGroup L2= new SequentialCommandGroup(
-        new RunArmClosedLoop(m_Elevator, ArmConstants.L2pos).withTimeout(0.6)
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L2pos),
+        new RunIntakeOpenLoopCoral(m_IntakePivot, ArmConstants.CPivotScore),
+        new Intakespit(m_intake).withTimeout(.5),
+        new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotScore),
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L1pos)
       );
     SequentialCommandGroup L3= new SequentialCommandGroup(
-        new RunArmClosedLoop(m_Elevator, ArmConstants.L3pos).withTimeout(0.6)
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L3pos),
+        new RunIntakeOpenLoopCoral(m_IntakePivot, ArmConstants.CPivotScore),
+        new Intakespit(m_intake).withTimeout(.5),
+        new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotScore),
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L1pos)
       );
     SequentialCommandGroup L4= new SequentialCommandGroup(
-        new RunArmClosedLoop(m_Elevator, ArmConstants.L4pos).withTimeout(0.6)
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L4pos),
+        new RunIntakeOpenLoopCoral(m_IntakePivot, ArmConstants.CPivotScore),
+        new Intakespit(m_intake).withTimeout(.5),
+        new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotScore),
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L1pos)
       );
+    SequentialCommandGroup ballGrab= new SequentialCommandGroup(
+    new RunIntakeOpenLoop(m_IntakePivotA,.25),
+    new IntakeNoteAutomatic(m_intakeA,1),
+    new RunIntakeOpenLoop(m_IntakePivotA,.44)
 
 
+    );
+    SequentialCommandGroup CStow= new SequentialCommandGroup(
+    new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotStow)
+    );
 
+    SequentialCommandGroup SpitBall= new SequentialCommandGroup(
+    new DropA(m_intakeA).withTimeout(.5),
+    new StopA(m_intakeA)
+    
 
-
+    );
 
 
 
@@ -113,6 +152,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("L2", L2);
         NamedCommands.registerCommand("L3", L3);
         NamedCommands.registerCommand("L4", L4);
+        NamedCommands.registerCommand("INTRUN", CStow);
 
         configureBindings();
     }
@@ -149,10 +189,21 @@ public class RobotContainer {
         joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
         joystick.x().whileTrue(new LimelightLateralAlignCommandX(drivetrain, 12.0));
-        gamepad.b().onTrue(new IntakeNoteAutomatic(m_intakeA));
-     /*   gamepad.y().onTrue(new RunArmClosedLoop(m_Elevator , ArmConstants.L2pos));    
-        gamepad.a().onTrue(new RunArmClosedLoop(m_Elevator , ArmConstants.L3pos));      
-        gamepad.x().onTrue(new RunArmClosedLoop(m_Elevator , ArmConstants.L4pos));     */
+        gamepad.b().onTrue(new RunIntakeOpenLoop(m_IntakePivotA, ArmConstants.APivotGrab));
+        gamepad.y().onTrue(new RunIntakeOpenLoop(m_IntakePivotA, ArmConstants.APivotStow));
+        gamepad.rightBumper().whileTrue(new Intakespit(m_intake));
+        gamepad.leftBumper().whileTrue(new IntakeSUCK(m_intake));
+        
+
+        gamepad.povLeft().onTrue(   new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotGrab ));
+        gamepad.povRight().onTrue(   new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotStow ));
+        gamepad.povDown().onTrue(   new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotScore ));
+
+
+        gamepad.povUp().onTrue(L1);    
+        gamepad.a().onTrue( new RunArmClosedLoop(m_Elevator, ArmConstants.L1pos));    
+        gamepad.x().onTrue( new RunArmClosedLoop(m_Elevator, ArmConstants.L3pos));      
+        //gamepad.leftStick().onTrue(L4);     
         
         // reset the field-centric heading on left bumper press
         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));

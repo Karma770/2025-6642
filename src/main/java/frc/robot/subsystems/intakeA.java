@@ -25,8 +25,7 @@ public class intakeA extends SubsystemBase {
     private final SparkMax right;
     private final RelativeEncoder encoder;
     private final SparkClosedLoopController intakePID;
-
-    private static final double STALL_CURRENT_LIMIT = 10.0; // Current threshold for stall condition
+    private static final double STALL_CURRENT_LIMIT = 7.0; // Current threshold for stall condition
 
     // Shuffleboard for monitoring current
     private final ShuffleboardTab tab = Shuffleboard.getTab("Intake");
@@ -37,12 +36,14 @@ public class intakeA extends SubsystemBase {
     public intakeA() {
         left = new SparkMax(CANConfig.ALGAE_INTAKE_LEFT, MotorType.kBrushless);
         right = new SparkMax(CANConfig.ALGAE_INTAKE_RIGHT, MotorType.kBrushless);
-
         intakePID = left.getClosedLoopController();
         encoder = left.getEncoder();
 
         SparkMaxConfig Leftconfig = new SparkMaxConfig();
-        Leftconfig.idleMode(IdleMode.kBrake);
+        Leftconfig
+        .inverted(true)
+
+        .idleMode(IdleMode.kBrake);
         Leftconfig.encoder
             .positionConversionFactor(1)
             .velocityConversionFactor(1);
@@ -86,16 +87,23 @@ public class intakeA extends SubsystemBase {
             System.out.println("WARNING: Intake Stalled! Current: " + current + " A");
             stopIntake(); // Stop intake if current is too high (indicating a stall)
         } else {
-            left.set(0.5); // Run the intake at 50% power (adjust as needed)
+
+            left.set(.5); // Run the intake at 50% power (adjust as needed)
         }
         
         // Update the Shuffleboard and SmartDashboard with current values
         currentEntry.setDouble(current);
     }
 
-    public boolean isCoral() {
-        return true; // Placeholder for coral detection logic
+    public void Drop() {
+
+
+        left.set(-.5); 
+
+
     }
+
+
 
     public double getPosition() {
         return encoder.getPosition();
@@ -111,7 +119,6 @@ public class intakeA extends SubsystemBase {
 
     public double getLeftMotorCurrent() {
         double current = left.getOutputCurrent();
-        System.out.println("Left Spark MAX Current: " + current + " A");
         return current;
     }
 
@@ -123,7 +130,6 @@ public class intakeA extends SubsystemBase {
     public void periodic() {
         // Update SmartDashboard every cycle with the current
         double current = getLeftMotorCurrent();
-        SmartDashboard.putNumber("Left Motor Current", current);
         currentEntry.setDouble(current);
          if (current > STALL_CURRENT_LIMIT) {
             System.out.println("WARNING: Intake Stalled! Current: " + current + " A");
