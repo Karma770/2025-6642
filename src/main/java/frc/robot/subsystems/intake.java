@@ -11,7 +11,11 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.CANConfig;
 
@@ -26,14 +30,18 @@ public class intake extends SubsystemBase{
     private final DigitalInput optic;
 
     private final SparkClosedLoopController intakePID;
-
-
+    private final ShuffleboardTab tab = Shuffleboard.getTab("Elevator");
+    private final GenericEntry opticEntry = tab.add("Optic", 0)
+                                                .withWidget(BuiltInWidgets.kBooleanBox)
+                                                .getEntry();
+    private final GenericEntry PosEntry = tab.add("POS", 0)
+                                                .getEntry();
 
     public intake(int Optic) {
 
         left = new SparkFlex (CANConfig.CORAL_RUN_LEFT ,MotorType.kBrushless);
         right = new SparkFlex (CANConfig.CORAL_RUN_RIGHT, MotorType.kBrushless);
-        optic = new DigitalInput(Optic);
+        optic = new DigitalInput(0);
   
 
         intakePID = left.getClosedLoopController();
@@ -108,5 +116,13 @@ public class intake extends SubsystemBase{
 
     public double getTemp() {
         return left.getMotorTemperature();
+    }    
+    public void periodic() {
+        boolean opticTF = isCoral();
+        opticEntry.setBoolean(opticTF);
+        double POS = encoder.getPosition();
+        PosEntry.setDouble(POS);
     }
+    
+    
 }

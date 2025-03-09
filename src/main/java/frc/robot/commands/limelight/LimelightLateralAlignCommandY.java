@@ -34,8 +34,8 @@ public class LimelightLateralAlignCommandY extends Command {
         }
 
         // ✅ Estimate distance using tA
-        double knownDistance = 36.0;  
-        double knownArea = 5.0;       
+        double knownDistance = 37.0;  
+        double knownArea = 2.9;       
         double estimatedDistance = (knownArea * knownDistance) / Math.max(tA, 0.1); 
 
         // ✅ Apply smoothing filter (Rolling Average)
@@ -55,7 +55,7 @@ public class LimelightLateralAlignCommandY extends Command {
         double forwardSpeedCommand = pidController.calculate(distanceError);
 
         // ✅ Limit max speed to prevent overshooting
-        forwardSpeedCommand = Math.max(-0.5, Math.min(0.5, forwardSpeedCommand));
+        forwardSpeedCommand = Math.max(0.5, Math.min(0.5, forwardSpeedCommand));
 
         // ✅ Apply movement (forward/backward based on Y-axis)
         ChassisSpeeds speeds = new ChassisSpeeds(forwardSpeedCommand, 0.0, 0.0);

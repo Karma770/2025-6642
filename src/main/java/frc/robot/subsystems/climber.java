@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
+import com.revrobotics.spark.config.AlternateEncoderConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -12,9 +12,14 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 
+import com.revrobotics.RelativeEncoder;
+
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.*;
 
@@ -25,45 +30,53 @@ import frc.robot.constants.*;
 
 
 
-public class IntakePivot extends SubsystemBase{
+public class climber extends SubsystemBase{
 
     /*We need methods to run the arm to postions using a rev throughbore encoder in absolute mode.
      * It is needed to read arm position and to move the arm.
      */
 
     public final SparkMax LeftMotor;
-    private final AbsoluteEncoder encoder;
+    //public final SparkMax RightMotor;
+    private final RelativeEncoder encoder;
     private final SparkClosedLoopController armPID;
- private final ShuffleboardTab tab = Shuffleboard.getTab("Elevator");
-    private final GenericEntry PosEntry = tab.add("IntakePOS", 0)
+
+    private final ShuffleboardTab tab = Shuffleboard.getTab("Climber");
+    private final GenericEntry currentEntry = tab.add("position", 0)
+
                                                 .getEntry();
-    public IntakePivot () {
 
-        LeftMotor = new SparkMax(CANConfig.CORAL_PIVOT_LEFT, MotorType.kBrushless);
-        encoder = LeftMotor.getAbsoluteEncoder();
-        armPID = LeftMotor.getClosedLoopController();
 
+
+    public climber () {
+
+        LeftMotor = new SparkMax(CANConfig.CLIMBER, MotorType.kBrushless);
+      //  RightMotor = new SparkMax(CANConfig.ELEVATOR_FRONT, MotorType.kBrushless);
 
         SparkMaxConfig Leftconfig = new SparkMaxConfig();
 Leftconfig
-    .inverted(false)
-    .smartCurrentLimit(40)
+    .inverted(true)
     .idleMode(IdleMode.kBrake);
-Leftconfig.absoluteEncoder
+Leftconfig.encoder
     .positionConversionFactor(1)
     .velocityConversionFactor(1);
 Leftconfig.closedLoop
-    .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-    .p(1.75)
-    .d(.0);
+    .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+    .p(.05)
+    .d(0);
 
             SparkMaxConfig Rightconfig = new SparkMaxConfig();
 Rightconfig
+    .inverted(true )
     .idleMode(IdleMode.kBrake)
     .follow(LeftMotor, true);
 
     
 LeftMotor.configure(Leftconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+//RightMotor.configure(Rightconfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        encoder = LeftMotor.getEncoder();
+        armPID = LeftMotor.getClosedLoopController();
 
 
 
@@ -71,7 +84,7 @@ LeftMotor.configure(Leftconfig, ResetMode.kResetSafeParameters, PersistMode.kPer
     }
 
     public void runOpenLoop(double supplier) {
-        if(getPos() >= 1) {
+        if(getPos() >= ArmConstants.kUpperLimit) {
             LeftMotor.set(0);
             System.out.println("¡TOO HIGH! ¡UPPER LIMIT!");
         }
@@ -88,7 +101,7 @@ LeftMotor.configure(Leftconfig, ResetMode.kResetSafeParameters, PersistMode.kPer
     public void hold() {
         //armPID.setReference(encoder.getPosition(), ControlType.kPosition);
          if(getPos() < ArmConstants.kUpperLimit) {
-        LeftMotor.set(0.03);
+        LeftMotor.set(0.0);
          }
     }
     public void stopArm(double speed){
@@ -98,37 +111,35 @@ LeftMotor.configure(Leftconfig, ResetMode.kResetSafeParameters, PersistMode.kPer
 
 
 }
-    public void runToPosition(double setpoint) {
+    public void runTovel(double setpoint) {
         System.out.println("Arm Current Position");
         System.out.println(getPos());
         System.out.println(setpoint);
-        //these are included safety measures. not necessary, but useful
-        if(getPos() >= 1) {
-            LeftMotor.set(0);
+
+        if(getPos() >= 286) {
+            LeftMotor.set(-.5);
             System.out.println("¡TOO HIGH! ¡UPPER LIMIT!");
-            System.out.println(getPos());
         }
-        else if(getPos() <= 0) {
-            LeftMotor.set(0);;
+        else if(getPos() <= -1) {
+            LeftMotor.set(.5);
             System.out.println("¡TOO LOW! ¡LOWER LIMIT!");
-            System.out.println(getPos());
         }
-        else{
-            armPID.setReference(setpoint, ControlType.kPosition);
+        else {
+            LeftMotor.set(setpoint);
+            
         }
-
-
-        
     }
 
     public double getPos() {
         return encoder.getPosition();
     }
 
-    public void periodic() {
+ public void periodic() {
+        // Update SmartDashboard every cycle with the current
+        double current = getPos();
+        SmartDashboard.putNumber("Position", current);
+        currentEntry.setDouble(current);
 
-        double POS = encoder.getPosition();
-        PosEntry.setDouble(POS);
     }
     
 }

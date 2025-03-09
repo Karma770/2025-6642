@@ -62,7 +62,7 @@ Leftconfig.encoder
     .velocityConversionFactor(1);
 Leftconfig.closedLoop
     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-    .p(.005)
+    .p(.05)
     .d(0);
 
             SparkMaxConfig Rightconfig = new SparkMaxConfig();

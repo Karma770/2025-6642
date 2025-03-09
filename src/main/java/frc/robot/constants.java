@@ -19,6 +19,7 @@ public class constants {
 
 
         public static final int ALGAE_INTAKE_RIGHT = 42;
+        public static final int CLIMBER = 59;
 
 
       }
@@ -44,16 +45,18 @@ public class constants {
 
         public static final double kUpperLimit = 30000;
         public static final double kLowerLimit = 0;
-        public static final double kTolearance = 5;
+        public static final double kTolearance = 2;
         public static final double kManualSpeed = 0.3;
         public static final double L1pos = 5;
-        public static final double L2pos = 52;
-        public static final double L3pos = 144;
+        public static final double L2pos = 80;
+        public static final double L3pos = 150;
         public static final double L4pos = 288;
         public static final double Lstowpos = 40;
         public static final double CPivotStow = .15;
-        public static final double CPivotScore = .4;
-        public static final double CPivotGrab = .55;
+        public static final double CPivotScore = .32;
+        public static final double CPivotScoreL3 = .45;
+
+        public static final double CPivotGrab = .51;
         public static final double APivotGrab = .20;
         public static final double APivotStow = .43;
 
