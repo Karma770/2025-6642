@@ -11,12 +11,12 @@ import frc.robot.subsystems.intake;
 
 
 
-public class RunIntakeOpenLoopB extends Command {
+public class RunIntakeOpenLoopCoral extends Command {
 
   private IntakePivot intake;
   private double speed;
   /** Creates a new RunIntakeOpenLoop. */
-  public RunIntakeOpenLoopB(IntakePivot m_IntakePivot, double input) {
+  public RunIntakeOpenLoopCoral(IntakePivot m_IntakePivot, double input) {
     intake = m_IntakePivot;
     speed = input;
     // Use addRequirements() here to declare subsystem dependencies.

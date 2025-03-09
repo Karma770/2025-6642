@@ -6,6 +6,7 @@ package frc.robot.commands.IntakeA;
 
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.IntakePivotA;
 
 
@@ -15,11 +16,11 @@ public class RunIntakeOpenLoop extends Command {
   private IntakePivotA intake;
   private double pos;
   /** Creates a new RunIntakeOpenLoop. */
-  public RunIntakeOpenLoop(IntakePivotA in, double input) {
-    intake = in;
+  public RunIntakeOpenLoop(IntakePivotA m_IntakePivotA, double input) {
+    intake = m_IntakePivotA;
     pos = input;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(in);
+    addRequirements(m_IntakePivotA);
   }
 
   // Called when the command is initially scheduled.

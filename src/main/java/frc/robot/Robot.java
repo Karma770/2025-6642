@@ -11,7 +11,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.Intake.RunIntakeOpenLoopB;
 import frc.robot.constants.ArmConstants;
 import frc.robot.subsystems.IntakePivot;
 import frc.robot.subsystems.IntakePivotA;

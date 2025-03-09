@@ -43,7 +43,7 @@ public class Elevator extends SubsystemBase{
 
     private final ShuffleboardTab tab = Shuffleboard.getTab("Elevator");
     private final GenericEntry currentEntry = tab.add("position", 0)
-                                                .withWidget(BuiltInWidgets.kGraph)
+
                                                 .getEntry();
 
 
@@ -62,8 +62,8 @@ Leftconfig.encoder
     .velocityConversionFactor(1);
 Leftconfig.closedLoop
     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-    .p(.50)
-    .d(.75);
+    .p(.005)
+    .d(0);
 
             SparkMaxConfig Rightconfig = new SparkMaxConfig();
 Rightconfig

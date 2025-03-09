@@ -7,21 +7,26 @@ package frc.robot.commands.Intake;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.constants.*;
+import frc.robot.subsystems.IntakePivot;
 //import frc.robot.Commands.LEDs.SetLED;
 //import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.intake;
 
-public class IntakeNoteAutomaticB extends Command {
+public class IntakeSUCK extends Command {
   //private final BlinkinSubsystem m_blink = new BlinkinSubsystem(0);
 //private final Blinkin m_blink = new Blinkin(0);
   private intake intake;
   private boolean end;
   /** Creates a new IntakeNoteAutomatic. */
-  public IntakeNoteAutomaticB(intake in) {
+  public IntakeSUCK(intake in) {
     intake = in;
     end = false;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(in);
+  }
+
+  public IntakeSUCK(IntakePivot m_IntakePivot, double cpivotscore) {
+    //TODO Auto-generated constructor stub
   }
 
   // Called when the command is initially scheduled.

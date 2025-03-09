@@ -39,20 +39,21 @@ public class constants {
     public static final Distance PROCCESSOR_APRILTAG_HEIGHT = Distance.ofBaseUnits(45.875, Inches);
     public static final Distance CORAL_APRILTAG_HEIGHT = Distance.ofBaseUnits(53.25, Inches);
   }
+
       public static class ArmConstants  {
 
         public static final double kUpperLimit = 30000;
         public static final double kLowerLimit = 0;
         public static final double kTolearance = 5;
         public static final double kManualSpeed = 0.3;
-        public static final double L1pos = 30;
-        public static final double L2pos = 40;
-        public static final double L3pos = 50;
-        public static final double L4pos = 100;
+        public static final double L1pos = 5;
+        public static final double L2pos = 52;
+        public static final double L3pos = 144;
+        public static final double L4pos = 288;
         public static final double Lstowpos = 40;
         public static final double CPivotStow = .15;
         public static final double CPivotScore = .4;
-        public static final double CPivotGrab = .6;
+        public static final double CPivotGrab = .55;
         public static final double APivotGrab = .20;
         public static final double APivotStow = .43;
 
