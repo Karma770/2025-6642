@@ -2,6 +2,7 @@ package frc.robot.generated;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
+
 public class T16000MController extends Joystick {
     public T16000MController(int port) {
         super(port);
@@ -20,18 +21,18 @@ public class T16000MController extends Joystick {
     // Add more methods for other axes/buttons if needed
     public JoystickButton T() {
         // Map to the correct button number for your controller
-        return new JoystickButton(this, 0);
+        return new JoystickButton(this, 1);
     }
     public JoystickButton D() {
         // Map to the correct button number for your controller
-        return new JoystickButton(this, 1);
+        return new JoystickButton(this, 2);
     }
     public JoystickButton L() {
         // Map to the correct button number for your controller
-        return new JoystickButton(this, 2);
+        return new JoystickButton(this, 3);
     }
     public JoystickButton R() {
         // Map to the correct button number for your controller
-        return new JoystickButton(this, 3);
+        return new JoystickButton(this, 4);
     }
 }

@@ -7,68 +7,99 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class LimelightLateralAlignCommandY extends Command { 
-    
+
     private final CommandSwerveDrivetrain drivetrain;
-    private final PIDController pidController = new PIDController(.05, 0.0, .01);
+    private final PIDController pidY = new PIDController(0.002, 0, 0.0001);  // Forward/backward alignment
+    private final PIDController pidX = new PIDController(0.02, 0, 0.001);   // Lateral alignment
+    private final PIDController pidRotate = new PIDController(0.01, 0, 0.0005); // Rotation alignment
     private final String limelightName = "limelight";
-    private final double desiredOffsetInches;
+    private final double desiredOffsetInchesY;
+    private final double desiredOffsetInchesX;
+    private final double conversionFactor = 1.0; // Inches per degree
+    private final double rotationTolerance = 2.0; // Degrees
 
-    private double previousDistance = 36.0; // ✅ ADDED for smoothing distance updates
+    private double previousDistance = 36.0; 
 
-    public LimelightLateralAlignCommandY(CommandSwerveDrivetrain drivetrain, double desiredOffsetInches) {
+    public LimelightLateralAlignCommandY(CommandSwerveDrivetrain drivetrain, double desiredOffsetInchesY, double desiredOffsetInchesX) {
         this.drivetrain = drivetrain;
-        this.desiredOffsetInches = desiredOffsetInches;
+        this.desiredOffsetInchesY = desiredOffsetInchesY;
+        this.desiredOffsetInchesX = desiredOffsetInchesX;
+
         addRequirements(drivetrain);
-        pidController.setSetpoint(0.0);
-        pidController.setTolerance(1); 
+        
+        pidY.setSetpoint(0.0);
+        pidY.setTolerance(1); 
+
+        pidX.setSetpoint(0.0); 
+        pidX.setTolerance(0.5); 
+
+        pidRotate.setSetpoint(0.0); // We want to be parallel to the tag
+        pidRotate.setTolerance(rotationTolerance);
     }
 
     @Override
     public void execute() {
         boolean hasTarget = LimelightHelpers.getTV(limelightName);
-        double tA = LimelightHelpers.getTA(limelightName); // ✅ Get AprilTag area
+        double tA = LimelightHelpers.getTA(limelightName); 
+        double tx = LimelightHelpers.getTX(limelightName); // Horizontal offset
+        double ts = LimelightHelpers.getTS(limelightName); // Skew (rotation)
 
         if (!hasTarget) {
             drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(new ChassisSpeeds(0, 0, 0)));
             return;
         }
-
-        // ✅ Estimate distance using tA
+        
+        // Estimate distance using area
         double knownDistance = 37.0;  
         double knownArea = 2.9;       
         double estimatedDistance = (knownArea * knownDistance) / Math.max(tA, 0.1); 
+        double estimatedLatx = tx * conversionFactor;
+        double lateralError = estimatedLatx - desiredOffsetInchesX;
+        double estimatedAngle = ts *1;
+        double angleError = estimatedAngle - 0;
 
-        // ✅ Apply smoothing filter (Rolling Average)
-        double smoothingFactor = 0.8;  
+        // Apply Exponential Smoothing Filter
+        double smoothingFactor = 0.8;
         estimatedDistance = (smoothingFactor * previousDistance) + ((1 - smoothingFactor) * estimatedDistance);
-        previousDistance = estimatedDistance; // Store for next loop
-
-        double distanceError = estimatedDistance - desiredOffsetInches;
-
-        // ✅ Deadband: Stop movement if within 2 inches
-        if (Math.abs(distanceError) < 2) {
-            drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(new ChassisSpeeds(0, 0, 0)));
-            return;
+        previousDistance = estimatedDistance;
+        
+        double distanceError = estimatedDistance - desiredOffsetInchesY;
+        
+        // Deadband for forward/backward movement
+        double forwardSpeedCommand;
+        if (Math.abs(distanceError) > 10) {  
+            forwardSpeedCommand = 0.7 * Math.signum(distanceError);  
+        } else {
+            forwardSpeedCommand = -pidY.calculate(distanceError);
         }
-
-        // ✅ Calculate forward/backward movement using PID
-        double forwardSpeedCommand = pidController.calculate(distanceError);
-
-        // ✅ Limit max speed to prevent overshooting
-        forwardSpeedCommand = Math.max(0.5, Math.min(0.5, forwardSpeedCommand));
-
-        // ✅ Apply movement (forward/backward based on Y-axis)
-        ChassisSpeeds speeds = new ChassisSpeeds(forwardSpeedCommand, 0.0, 0.0);
-        drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(speeds));
+        
+        // Clamp speed for safety
+        forwardSpeedCommand = Math.max(-0.7, Math.min(0.7, forwardSpeedCommand)); 
+    
+        // Lateral movement correction
+        double lateralSpeedCommand = pidX.calculate(lateralError); 
+        lateralSpeedCommand = Math.max(-0.5, Math.min(0.5, lateralSpeedCommand)); 
+    
+        // **Rotation alignment to stay parallel**
+        double rotationSpeedCommand = pidRotate.calculate(angleError); 
+        rotationSpeedCommand = Math.max(-0.5, Math.min(0.5, rotationSpeedCommand)); // Clamp for safety
+    
+        // Apply forward, lateral, and rotational movement
+        drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(
+            new ChassisSpeeds(forwardSpeedCommand, lateralSpeedCommand, rotationSpeedCommand)
+        ));
     }
-
+    
     @Override
     public boolean isFinished() {
-        return pidController.atSetpoint();
+        return pidY.atSetpoint() && pidX.atSetpoint() && pidRotate.atSetpoint();
     }
-
+    
     @Override
     public void end(boolean interrupted) {
-        drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(new ChassisSpeeds()));
+        drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(new ChassisSpeeds(0, 0, 0)));
+        pidY.reset();
+        pidX.reset();
+        pidRotate.reset();
     }
 }

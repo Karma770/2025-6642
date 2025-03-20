@@ -13,7 +13,10 @@ public class LimelightLateralAlignCommandX extends Command{
 private final CommandSwerveDrivetrain drivetrain;
 
 // PID controller to drive lateral error (in inches) to zero. 
-private final PIDController pidController = new PIDController(.05, 0.0, .01);
+private final PIDController pidController = new PIDController(0.03, 0.0, 0.02);
+private double previousCommand = 0.0;
+private final double smoothingFactor = 0.8; // Higher = smoother, Lower = faster response
+
  // Name of your limelight 
  private final String limelightName = "limelight";
 // Conversion factor to convert tx (degrees) to lateral offset (inches).
@@ -36,34 +39,30 @@ public LimelightLateralAlignCommandX(CommandSwerveDrivetrain drivetrain, double 
     pidController.setSetpoint(0.0);
     pidController.setTolerance(1); // Adjust tolerance as needed (in inches)
 }
-
 @Override
 public void execute() {
-    // Read the horizontal offset (tx) in degrees from the Limelight.
     double tx = LimelightHelpers.getTX(limelightName);
-    
-    // Convert the tx value to a lateral offset in inches.
-    // For a rough conversion, multiply tx by a calibrated conversion factor.
     double currentLateralOffset = tx * conversionFactor;
-    
-    // Calculate the error relative to the desired offset.
-    // For example, if you want the robot centered (0 inches), the error is currentLateralOffset - 0.
-    // If you want a 6-inch offset, the error is currentLateralOffset - 6.
     double error = currentLateralOffset - desiredOffsetInches;
     
-
+    // ✅ Increase deadband to prevent jitter
+    if (Math.abs(error) < 1.5) { 
+        drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(new ChassisSpeeds(0, 0, 0)));
+        return; 
+    }
     
-    // Get the lateral adjustment command from the PID controller.
+    // ✅ Compute lateral speed command with PID
     double lateralSpeedCommand = pidController.calculate(error);
-    
-    // Create a chassis speeds object:
-    // Assuming that x is forward and y is lateral (positive y may be left depending on your configuration).
-    // Here we only drive laterally (set forward speed to 0 and no rotation).
-    ChassisSpeeds speeds = new ChassisSpeeds(0.0, lateralSpeedCommand, 0.0);
-    
-    // Command the drivetrain.
-    drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(speeds)
-    );
+
+    // ✅ Apply smoothing to reduce jitter
+    lateralSpeedCommand = (smoothingFactor * previousCommand) + ((1 - smoothingFactor) * lateralSpeedCommand);
+    previousCommand = lateralSpeedCommand;
+
+    // ✅ Limit speed to prevent overshooting
+    lateralSpeedCommand = Math.max(-0.3, Math.min(0.3, lateralSpeedCommand));
+
+    // ✅ Send speeds to drivetrain
+    drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(new ChassisSpeeds(0.0, lateralSpeedCommand, 0.0)));
 }
 
 @Override
@@ -74,8 +73,8 @@ public boolean isFinished() {
 
 @Override
 public void end(boolean interrupted) {
-    // Stop the drivetrain when the command ends.
-    drivetrain.setControl(
-        drivetrain.m_pathApplyRobotSpeeds.withSpeeds(new ChassisSpeeds())
-    );
-}}
+    drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(new ChassisSpeeds(0, 0, 0)));
+    pidController.reset();  // ✅ Reset PID for next use
+}
+
+}

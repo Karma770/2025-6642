@@ -123,10 +123,6 @@ public class RobotContainer {
     
 
     );
-SequentialCommandGroup Limey = new SequentialCommandGroup(
-    new LimelightLateralAlignCommandY(drivetrain, 15).withTimeout(2)
-
-);
 
 
 
@@ -146,7 +142,6 @@ SequentialCommandGroup Limey = new SequentialCommandGroup(
         NamedCommands.registerCommand("L2", L2);
         NamedCommands.registerCommand("L3", L3);
         NamedCommands.registerCommand("INTRUN", CStow);
-        NamedCommands.registerCommand("Limey", Limey);
 
 
         configureBindings();
@@ -170,14 +165,11 @@ SequentialCommandGroup Limey = new SequentialCommandGroup(
        // joystick.x().whileTrue(new AlignCommand(drivetrain, m_Vision));
 
         // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
+        // Note that each routine should be run exactly once in a single frog.
 
-        joystick.R().whileTrue(new LimelightLateralAlignCommandX(drivetrain, 18.0));
-        joystick.L().whileTrue(new LimelightLateralAlignCommandX(drivetrain, -18.0));
-        joystick.D().whileTrue(new LimelightLateralAlignCommandX(drivetrain, 0.0));
-
-        joystick.T().whileTrue(new LimelightLateralAlignCommandY(drivetrain, 15.5));
-
+        joystick2.T().whileTrue(new LimelightLateralAlignCommandY(drivetrain, 10,-16));
+        joystick2.D().whileTrue(new LimelightLateralAlignCommandY(drivetrain, 10,12));
+//15.5
         //gamepad.b().onTrue(new RunIntakeOpenLoop(m_IntakePivotA, ArmConstants.APivotGrab));
         //gamepad.y().onTrue(new RunIntakeOpenLoop(m_IntakePivotA, ArmConstants.APivotStow));
         gamepad.rightBumper().whileTrue(new Intakespit(m_intake));
