@@ -34,6 +34,7 @@ import frc.robot.commands.IntakeA.RunIntakeOpenLoop;
 import frc.robot.commands.IntakeA.StopA;
 import frc.robot.commands.limelight.LimelightLateralAlignCommandY;
 import frc.robot.commands.limelight.LimelightLateralAlignCommandX;
+import frc.robot.generated.T16000MController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
@@ -80,8 +81,9 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
-    private final CommandXboxController joystick = new CommandXboxController(0);
-    private final CommandXboxController gamepad = new CommandXboxController(1);
+    private final T16000MController joystick = new T16000MController(0);
+    private final T16000MController joystick2 = new T16000MController(1);
+    private final CommandXboxController gamepad = new CommandXboxController(2);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -158,28 +160,23 @@ SequentialCommandGroup Limey = new SequentialCommandGroup(
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                    .withRotationalRate(joystick2.getLeftX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
 
 
 
-        joystick.pov(0).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(0.5).withVelocityY(0))
-        );
-        joystick.pov(180).whileTrue(drivetrain.applyRequest(() ->
-            forwardStraight.withVelocityX(-0.5).withVelocityY(0))
-        );
+
        // joystick.x().whileTrue(new AlignCommand(drivetrain, m_Vision));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
 
-        joystick.x().whileTrue(new LimelightLateralAlignCommandX(drivetrain, 18.0));
-        joystick.b().whileTrue(new LimelightLateralAlignCommandX(drivetrain, -18.0));
-        joystick.a().whileTrue(new LimelightLateralAlignCommandX(drivetrain, 0.0));
+        joystick.R().whileTrue(new LimelightLateralAlignCommandX(drivetrain, 18.0));
+        joystick.L().whileTrue(new LimelightLateralAlignCommandX(drivetrain, -18.0));
+        joystick.D().whileTrue(new LimelightLateralAlignCommandX(drivetrain, 0.0));
 
-        joystick.y().whileTrue(new LimelightLateralAlignCommandY(drivetrain, 15.5));
+        joystick.T().whileTrue(new LimelightLateralAlignCommandY(drivetrain, 15.5));
 
         //gamepad.b().onTrue(new RunIntakeOpenLoop(m_IntakePivotA, ArmConstants.APivotGrab));
         //gamepad.y().onTrue(new RunIntakeOpenLoop(m_IntakePivotA, ArmConstants.APivotStow));
@@ -205,7 +202,7 @@ SequentialCommandGroup Limey = new SequentialCommandGroup(
 
         
         // reset the field-centric heading on left bumper press    
-         joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+         joystick.T().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
