@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.Map;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
@@ -16,6 +18,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.CANConfig;
 
@@ -30,12 +33,8 @@ public class intake extends SubsystemBase{
     private final DigitalInput optic;
 
     private final SparkClosedLoopController intakePID;
-    private final ShuffleboardTab tab = Shuffleboard.getTab("Elevator");
-    private final GenericEntry opticEntry = tab.add("Optic", 0)
-                                                .withWidget(BuiltInWidgets.kBooleanBox)
-                                                .getEntry();
-    private final GenericEntry PosEntry = tab.add("POS", 0)
-                                                .getEntry();
+    private final ShuffleboardTab tab = Shuffleboard.getTab("optic");
+
 
     public intake(int Optic) {
 
@@ -54,8 +53,8 @@ public class intake extends SubsystemBase{
             .velocityConversionFactor(1);
         Leftconfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .p(1.0)
-            .d(.5);
+            .p(.05)
+            .d(0);
         
                     SparkMaxConfig Rightconfig = new SparkMaxConfig();
         Rightconfig
@@ -89,17 +88,17 @@ public class intake extends SubsystemBase{
     }
 
     public void autoIntake() {
-        if(!isCoral()){
-            intakePID.setReference(0.05, ControlType.kVelocity);
+        if(isCoral()){
+            left.set(.2);
         }
         else {
-            hold(encoder.getPosition());
+            left.set(0);
         }
+
     }
 
     public boolean isCoral() {
-        return false;
-       // return optic.get();
+        return optic.get();
     }
 
     public double getPosition() {
@@ -118,10 +117,7 @@ public class intake extends SubsystemBase{
         return left.getMotorTemperature();
     }    
     public void periodic() {
-        boolean opticTF = isCoral();
-        opticEntry.setBoolean(opticTF);
-        double POS = encoder.getPosition();
-        PosEntry.setDouble(POS);
+
     }
     
     

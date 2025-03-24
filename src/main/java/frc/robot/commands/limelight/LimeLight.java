@@ -6,13 +6,12 @@ import frc.robot.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
-public class LimelightLateralAlignCommandY extends Command { 
+public class LimeLight extends Command { 
 
     private final CommandSwerveDrivetrain drivetrain;
     private final PIDController pidY = new PIDController(0.002, 0, 0.0001);  // Forward/backward alignment
     private final PIDController pidX = new PIDController(0.02, 0, 0.001);   // Lateral alignment
-    private final PIDController pidRotate = new PIDController(0.01, 0, 0.0005); // Rotation alignment
-    private final String limelightName = "limelight";
+    private final String limelightName;
     private final double desiredOffsetInchesY;
     private final double desiredOffsetInchesX;
     private final double conversionFactor = 1.0; // Inches per degree
@@ -20,10 +19,11 @@ public class LimelightLateralAlignCommandY extends Command {
 
     private double previousDistance = 36.0; 
 
-    public LimelightLateralAlignCommandY(CommandSwerveDrivetrain drivetrain, double desiredOffsetInchesY, double desiredOffsetInchesX) {
+    public LimeLight(CommandSwerveDrivetrain drivetrain, double desiredOffsetInchesY, double desiredOffsetInchesX, String limelight) {
         this.drivetrain = drivetrain;
         this.desiredOffsetInchesY = desiredOffsetInchesY;
         this.desiredOffsetInchesX = desiredOffsetInchesX;
+        this.limelightName = limelight;
 
         addRequirements(drivetrain);
         
@@ -33,16 +33,28 @@ public class LimelightLateralAlignCommandY extends Command {
         pidX.setSetpoint(0.0); 
         pidX.setTolerance(0.5); 
 
-        pidRotate.setSetpoint(0.0); // We want to be parallel to the tag
-        pidRotate.setTolerance(rotationTolerance);
     }
 
     @Override
     public void execute() {
+
+
+        
         boolean hasTarget = LimelightHelpers.getTV(limelightName);
         double tA = LimelightHelpers.getTA(limelightName); 
         double tx = LimelightHelpers.getTX(limelightName); // Horizontal offset
         double ts = LimelightHelpers.getTS(limelightName); // Skew (rotation)
+
+
+        System.out.println("Using Limelight: " + limelightName);
+        System.out.println("Has Target: " + hasTarget);
+        System.out.println("TX: " + tx);
+        System.out.println("TA: " + tA);
+        System.out.println("TS: " + ts);
+        
+
+
+
 
         if (!hasTarget) {
             drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(new ChassisSpeeds(0, 0, 0)));
@@ -51,7 +63,10 @@ public class LimelightLateralAlignCommandY extends Command {
         
         // Estimate distance using area
         double knownDistance = 37.0;  
-        double knownArea = 2.9;       
+        double knownArea = 2.9;    
+        
+        
+
         double estimatedDistance = (knownArea * knownDistance) / Math.max(tA, 0.1); 
         double estimatedLatx = tx * conversionFactor;
         double lateralError = estimatedLatx - desiredOffsetInchesX;
@@ -81,18 +96,23 @@ public class LimelightLateralAlignCommandY extends Command {
         lateralSpeedCommand = Math.max(-0.5, Math.min(0.5, lateralSpeedCommand)); 
     
         // **Rotation alignment to stay parallel**
-        double rotationSpeedCommand = pidRotate.calculate(angleError); 
-        rotationSpeedCommand = Math.max(-0.5, Math.min(0.5, rotationSpeedCommand)); // Clamp for safety
     
+
+        System.out.println("Forward Speed Command: " + forwardSpeedCommand);
+        System.out.println("Lateral Speed Command: " + lateralSpeedCommand);
+        
+
+
+
         // Apply forward, lateral, and rotational movement
         drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(
-            new ChassisSpeeds(forwardSpeedCommand, lateralSpeedCommand, rotationSpeedCommand)
+            new ChassisSpeeds(forwardSpeedCommand, lateralSpeedCommand, 0)
         ));
     }
     
     @Override
     public boolean isFinished() {
-        return pidY.atSetpoint() && pidX.atSetpoint() && pidRotate.atSetpoint();
+        return pidY.atSetpoint() && pidX.atSetpoint();
     }
     
     @Override
@@ -100,6 +120,5 @@ public class LimelightLateralAlignCommandY extends Command {
         drivetrain.setControl(drivetrain.m_pathApplyRobotSpeeds.withSpeeds(new ChassisSpeeds(0, 0, 0)));
         pidY.reset();
         pidX.reset();
-        pidRotate.reset();
     }
 }

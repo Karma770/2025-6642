@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -28,12 +29,10 @@ import frc.robot.commands.Intake.IntakeSUCK;
 import frc.robot.commands.Intake.Intakespit;
 import frc.robot.commands.Intake.RunIntakeOpenLoopCoral;
 import frc.robot.commands.Intake.IntakeSUCK;
-import frc.robot.commands.IntakeA.DropA;
-import frc.robot.commands.IntakeA.IntakeNoteAutomatic;
+
 import frc.robot.commands.IntakeA.RunIntakeOpenLoop;
-import frc.robot.commands.IntakeA.StopA;
-import frc.robot.commands.limelight.LimelightLateralAlignCommandY;
-import frc.robot.commands.limelight.LimelightLateralAlignCommandX;
+import frc.robot.commands.limelight.LimeLeft;
+import frc.robot.commands.limelight.LimeLight;
 import frc.robot.generated.T16000MController;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -43,9 +42,8 @@ import frc.robot.subsystems.IntakePivotA;
 import frc.robot.subsystems.climber;
 import frc.robot.subsystems.intake;
 //import frc.robot.subsystems.VisionSubsystem;
-import frc.robot.subsystems.intakeA;
 
-
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 
 
@@ -56,7 +54,6 @@ public class RobotContainer {
 
 
     private final Elevator m_Elevator = new Elevator( CANConfig.ELEVATOR_FRONT, CANConfig.ELEVATOR_BACK);
-    private final intakeA m_intakeA = new intakeA();
     private final climber m_climber = new climber();
 
     private final IntakePivotA m_IntakePivotA = new IntakePivotA();
@@ -93,39 +90,59 @@ public class RobotContainer {
     
 
 
-    SequentialCommandGroup L1= new SequentialCommandGroup(
-        new RunArmClosedLoop(m_Elevator, ArmConstants.L1pos).withTimeout(1.5),
+    ParallelCommandGroup L1= new ParallelCommandGroup(
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L1pos),
         new RunIntakeOpenLoopCoral(m_IntakePivot, ArmConstants.CPivotScore)
       );
-    SequentialCommandGroup L2= new SequentialCommandGroup(
-        new RunArmClosedLoop(m_Elevator, ArmConstants.L2pos).withTimeout(1.5),
+      ParallelCommandGroup L2= new ParallelCommandGroup(
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L2pos),
         new RunIntakeOpenLoopCoral(m_IntakePivot, ArmConstants.CPivotScore)
       );
-    SequentialCommandGroup L3= new SequentialCommandGroup(
-        new RunArmClosedLoop(m_Elevator, ArmConstants.L3pos).withTimeout(1.5),
-        new RunIntakeOpenLoopCoral(m_IntakePivot, ArmConstants.CPivotScoreL3)
+    ParallelCommandGroup L3= new ParallelCommandGroup(
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L3pos),
+        new RunIntakeOpenLoopCoral(m_IntakePivot, ArmConstants.CPivotScore)
 
       );
-    SequentialCommandGroup ballGrab= new SequentialCommandGroup(
-    new RunIntakeOpenLoop(m_IntakePivotA,.25),
-    new IntakeNoteAutomatic(m_intakeA,1),
-    new RunIntakeOpenLoop(m_IntakePivotA,.44)
+      ParallelCommandGroup L4= new ParallelCommandGroup(
+        new RunArmClosedLoop(m_Elevator, ArmConstants.L4pos),
+        new RunIntakeOpenLoopCoral(m_IntakePivot, ArmConstants.CPivotScore)
+
+      );
 
 
-    );
+
+    
     SequentialCommandGroup CStow= new SequentialCommandGroup(
     new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotStow)
     );
 
-    SequentialCommandGroup SpitBall= new SequentialCommandGroup(
-    new DropA(m_intakeA).withTimeout(.5),
-    new StopA(m_intakeA)
-    
 
+
+    SequentialCommandGroup goLeft= new SequentialCommandGroup(
+        drivetrain.runOnce(() -> drivetrain.seedFieldCentric()),
+        drivetrain.applyRequest(() ->
+        drive.withVelocityX(0) 
+            .withVelocityY(-1 * MaxSpeed) 
+            .withRotationalRate(0) 
+).withTimeout(.130),
+drivetrain.applyRequest(() ->
+drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+    .withRotationalRate(joystick2.getLeftX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+)
     );
-
-
-
+    SequentialCommandGroup goRight= new SequentialCommandGroup(
+        drivetrain.applyRequest(() ->
+        drive.withVelocityX(0) 
+            .withVelocityY(1 * MaxSpeed) 
+            .withRotationalRate(0) 
+).withTimeout(.130),
+drivetrain.applyRequest(() ->
+drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+    .withRotationalRate(joystick2.getLeftX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+)
+    );
 
 
 
@@ -167,30 +184,32 @@ public class RobotContainer {
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single frog.
 
-        joystick2.T().whileTrue(new LimelightLateralAlignCommandY(drivetrain, 10,-16));
-        joystick2.D().whileTrue(new LimelightLateralAlignCommandY(drivetrain, 10,12));
+        joystick2.L().whileTrue(new LimeLight(drivetrain, 4,0,"limelight-left"));
+        joystick2.R().whileTrue(new LimeLight(drivetrain, 4,0,"limelight-right"));
+
 //15.5
         //gamepad.b().onTrue(new RunIntakeOpenLoop(m_IntakePivotA, ArmConstants.APivotGrab));
         //gamepad.y().onTrue(new RunIntakeOpenLoop(m_IntakePivotA, ArmConstants.APivotStow));
         gamepad.rightBumper().whileTrue(new Intakespit(m_intake));
         gamepad.leftBumper().whileTrue(new IntakeSUCK(m_intake));
-        gamepad.rightTrigger().onTrue(new IntakeNoteAutomatic(m_intakeA,0.5));
-        gamepad.leftTrigger().onTrue(SpitBall);
+
         
 
 
 
-        gamepad.povLeft().onTrue(   new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotGrab ));
         gamepad.povRight().onTrue(   new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotStow ));
         gamepad.povDown().onTrue(   new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotScore ));
-        gamepad.leftStick().onTrue(new RunIntakeOpenLoopCoral(m_IntakePivot,ArmConstants.CPivotScoreL3));
 
-        //gamepad.povUp().onTrue(new RunArmClosedLoop(m_Elevator, ArmConstants.L1pos));    
         gamepad.povUp().onTrue(L1);
         gamepad.a().onTrue(L2);    
         gamepad.x().onTrue(L3);  
+        gamepad.leftStick().onTrue(L4);  
+
         gamepad.y().whileTrue(new Climb(m_climber, .5));
         gamepad.b().whileTrue(new Climb(m_climber, -.5));
+
+        gamepad.rightTrigger().whileTrue(new RunIntakeOpenLoop(m_IntakePivotA, 9));
+        gamepad.leftTrigger().whileTrue(new RunIntakeOpenLoop(m_IntakePivotA,0));
 
         
         // reset the field-centric heading on left bumper press    

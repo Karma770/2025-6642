@@ -31,13 +31,10 @@ public class Intakespit extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(!intake.isCoral()) {
-      //intake.autoIntake();
+
       intake.runOpenLoop(-SystemConfig.CORAL_INTAKE_SPEED);
       System.out.println("INTAKE RUNNING");
-      //new SetLED(m_blink, -0.99);
 
-    }
   }
 
   // Called once the command ends or is interrupted.
@@ -51,7 +48,7 @@ public class Intakespit extends Command {
   @Override
   public boolean isFinished() {
       //System.out.println("Intake Stoped");
-      return intake.isCoral();
+      return false;
  
     
      

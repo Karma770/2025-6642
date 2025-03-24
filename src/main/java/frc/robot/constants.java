@@ -11,8 +11,6 @@ public class constants {
         public static final int ELEVATOR_FRONT = 30;
         public static final int ELEVATOR_BACK = 31;
         public static final int ALGAE_PIVOT = 40;
-        public static final int ALGAE_INTAKE_LEFT = 41;
-
         public static final int CORAL_PIVOT_LEFT = 21;
         public static final int CORAL_RUN_LEFT = 22;
         public static final int CORAL_RUN_RIGHT = 23;
@@ -43,22 +41,25 @@ public class constants {
 
       public static class ArmConstants  {
 
-        public static final double kUpperLimit = 30000;
-        public static final double kLowerLimit = 0;
+        public static final double kUpperLimit = 0;
+        public static final double kLowerLimit = -30000;
         public static final double kTolearance = 2;
         public static final double kManualSpeed = 0.3;
-        public static final double L1pos = 5;
-        public static final double L2pos = 80;
-        public static final double L3pos = 150;
-        public static final double L4pos = 288;
+        public static final double L1pos = -5;
+        public static final double L2pos = -90;
+        public static final double L3pos = -230;
+        public static final double L4pos = -410;
         public static final double Lstowpos = 40;
-        public static final double CPivotStow = .15;
-        public static final double CPivotScore = .32;
-        public static final double CPivotScoreL3 = .45;
+        public static final double CPivotStow = .83;
+        public static final double CPivotScore = .285;
 
-        public static final double CPivotGrab = .51;
-        public static final double APivotGrab = .20;
-        public static final double APivotStow = .43;
+
+
+
+
+
+        public static final double APivotGrab = .1;
+        public static final double APivotStow = 8;
 
 
 

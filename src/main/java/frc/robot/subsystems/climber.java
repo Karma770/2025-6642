@@ -100,9 +100,9 @@ LeftMotor.configure(Leftconfig, ResetMode.kResetSafeParameters, PersistMode.kPer
 
     public void hold() {
         //armPID.setReference(encoder.getPosition(), ControlType.kPosition);
-         if(getPos() < ArmConstants.kUpperLimit) {
+
         LeftMotor.set(0.0);
-         }
+         
     }
     public void stopArm(double speed){
 
@@ -116,18 +116,9 @@ LeftMotor.configure(Leftconfig, ResetMode.kResetSafeParameters, PersistMode.kPer
         System.out.println(getPos());
         System.out.println(setpoint);
 
-        if(getPos() >= 286) {
-            LeftMotor.set(-.5);
-            System.out.println("¡TOO HIGH! ¡UPPER LIMIT!");
-        }
-        else if(getPos() <= -1) {
-            LeftMotor.set(.5);
-            System.out.println("¡TOO LOW! ¡LOWER LIMIT!");
-        }
-        else {
             LeftMotor.set(setpoint);
             
-        }
+        
     }
 
     public double getPos() {

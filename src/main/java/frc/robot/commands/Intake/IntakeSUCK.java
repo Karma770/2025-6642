@@ -31,32 +31,30 @@ public class IntakeSUCK extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    intake.autoIntake();
+    System.out.println("INTAKE RUNNING");
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(!intake.isCoral()) {
-      //intake.autoIntake();
-      intake.runOpenLoop(SystemConfig.CORAL_INTAKE_SPEED);
-      System.out.println("INTAKE RUNNING");
-      //new SetLED(m_blink, -0.99);
+    intake.autoIntake();
+    System.out.println("INTAKE RUNNING");
 
-    }
+
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-  //new SetLED(m_blink, -0.99);
-  intake.stopIntake(0);
-
+    intake.stopIntake(0);
   }
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-      //System.out.println("Intake Stoped");
-      return intake.isCoral();
+
+      return false;
  
     
      

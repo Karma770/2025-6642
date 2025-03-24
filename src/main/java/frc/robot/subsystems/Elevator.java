@@ -38,6 +38,9 @@ public class Elevator extends SubsystemBase{
 
     public final SparkMax LeftMotor;
     public final SparkMax RightMotor;
+    
+    public final double conf;
+
     private final RelativeEncoder encoder;
     private final SparkClosedLoopController armPID;
 
@@ -52,14 +55,14 @@ public class Elevator extends SubsystemBase{
 
         LeftMotor = new SparkMax(CANConfig.ELEVATOR_BACK, MotorType.kBrushless);
         RightMotor = new SparkMax(CANConfig.ELEVATOR_FRONT, MotorType.kBrushless);
-
+         conf = 1;
         SparkMaxConfig Leftconfig = new SparkMaxConfig();
 Leftconfig
     .inverted(true)
     .idleMode(IdleMode.kBrake);
 Leftconfig.encoder
-    .positionConversionFactor(1)
-    .velocityConversionFactor(1);
+    .positionConversionFactor(conf)
+    .velocityConversionFactor(conf);
 Leftconfig.closedLoop
     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
     .p(.05)

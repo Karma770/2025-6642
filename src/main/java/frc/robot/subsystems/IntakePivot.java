@@ -87,7 +87,7 @@ LeftMotor.configure(Leftconfig, ResetMode.kResetSafeParameters, PersistMode.kPer
 
     public void hold() {
         //armPID.setReference(encoder.getPosition(), ControlType.kPosition);
-         if(getPos() < ArmConstants.kUpperLimit) {
+         if(getPos() < 1) {
         LeftMotor.set(0.03);
          }
     }
